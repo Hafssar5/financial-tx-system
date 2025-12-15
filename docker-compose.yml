@@ -1,0 +1,75 @@
+version: "3.9"
+
+services:
+  # ============================================
+  # Infrastructure Services
+  # ============================================
+  postgres:
+    image: postgres:15-alpine
+    container_name: tx-postgres
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: transactions
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./database/migrations:/docker-entrypoint-initdb.d
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  redis:
+    image: redis:7-alpine
+    container_name: tx-redis
+    ports:
+      - "6379:6379"
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  localstack:
+    image: localstack/localstack:latest
+    container_name: tx-localstack
+    environment:
+      - SERVICES=kinesis,dynamodb,sqs,sns,lambda,s3,cloudwatch
+      - DEBUG=1
+      - AWS_DEFAULT_REGION=us-east-1
+      - DOCKER_HOST=unix:///var/run/docker.sock
+    ports:
+      - "4566:4566"
+      - "4510-4559:4510-4559"
+    volumes:
+      - localstack_data:/var/lib/localstack
+      - /var/run/docker.sock:/var/run/docker.sock
+      - ./scripts:/etc/localstack/init/ready.d
+
+  # ============================================
+  # Application Services (uncomment when ready)
+  # ============================================
+  # gateway:
+  #   build: ./services/gateway
+  #   container_name: tx-gateway
+  #   ports:
+  #     - "8080:80"
+  #   environment:
+  #     - AWS_ENDPOINT=http://localstack:4566
+  #     - DATABASE_URL=postgresql://postgres:postgres@postgres:5432/transactions
+  #   depends_on:
+  #     postgres:
+  #       condition: service_healthy
+  #     localstack:
+  #       condition: service_started
+
+volumes:
+  postgres_data:
+  localstack_data:
+
+networks:
+  default:
+    name: tx-network
