@@ -49,22 +49,19 @@ services:
       - /var/run/docker.sock:/var/run/docker.sock
       - ./scripts:/etc/localstack/init/ready.d
 
-  # ============================================
-  # Application Services (uncomment when ready)
-  # ============================================
-  # gateway:
-  #   build: ./services/gateway
-  #   container_name: tx-gateway
-  #   ports:
-  #     - "8080:80"
-  #   environment:
-  #     - AWS_ENDPOINT=http://localstack:4566
-  #     - DATABASE_URL=postgresql://postgres:postgres@postgres:5432/transactions
-  #   depends_on:
-  #     postgres:
-  #       condition: service_healthy
-  #     localstack:
-  #       condition: service_started
+  gateway:
+    build: ./services/gateway
+    container_name: tx-gateway
+    ports:
+      - "8080:80"
+    environment:
+      - AWS_ENDPOINT=http://localstack:4566
+      - DATABASE_URL=postgresql://postgres:postgres@postgres:5432/transactions
+    depends_on:
+      postgres:
+        condition: service_healthy
+      localstack:
+        condition: service_started
 
 volumes:
   postgres_data:

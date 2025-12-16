@@ -76,4 +76,7 @@ CREATE TRIGGER trg_account_updated
     BEFORE UPDATE ON ledger_accounts
     FOR EACH ROW EXECUTE FUNCTION update_updated_at();
 
-RAISE NOTICE 'Database initialization complete!';
+DO $$
+BEGIN
+    RAISE NOTICE 'Database initialization complete!';
+END $$;

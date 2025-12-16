@@ -1,0 +1,9 @@
+fastapi==0.110.0          # Web framework
+uvicorn[standard]==0.29.0 # ASGI server
+aioboto3==12.4.0          # Async Boto3 wrapper
+boto3-stubs[dynamodb,kinesis]==1.34.20  # Type hints
+pydantic[email]==2.6.3    # Validation library
+python-dotenv==1.0.1      # .env loader (dev only)
+loguru==0.7.2             # Structured logging
+pydantic-settings>=2.0,<3.0
+pytest==8.1.1
